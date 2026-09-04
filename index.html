@@ -222,17 +222,51 @@ button:has(+ .set-row) {
 }
 </style>
 
+<style>
+.pp-progression{padding:18px 0 36px}
+.pp-prog-hero{padding:3px 2px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.pp-label{font-size:9px;letter-spacing:.16em;color:var(--text-muted)}
+.pp-week{font-family:'Oswald',sans-serif;font-size:38px;letter-spacing:.02em;margin-top:8px}
+.pp-sub{font-size:11px;color:var(--text-muted);margin-top:4px}
+.pp-card{border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:14px;margin:10px 0}
+.pp-card-title{font-family:'Oswald',sans-serif;font-size:16px;letter-spacing:.03em;margin-bottom:8px}
+.pp-muted{font-size:11px;line-height:1.55;color:var(--text-muted);margin-bottom:12px}
+.pp-field{display:block}.pp-field span,.pp-grid label span{display:block;font-size:9px;letter-spacing:.12em;color:var(--text-muted);margin-bottom:5px}
+.pp-field input,.pp-grid input{width:100%;background:none;border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-size:12px}
+.pp-primary{width:100%;margin-top:10px;border:1px solid var(--border);border-radius:7px;background:var(--surface-2);color:var(--text);padding:9px;font-size:11px}
+.pp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pp-grid .wide{grid-column:1/-1}
+.pp-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.pp-photos label>span{display:block;font-size:8px;letter-spacing:.12em;color:var(--text-muted);margin-bottom:5px}
+.pp-photos input{display:none}.pp-photo{aspect-ratio:3/4;border:1px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px;overflow:hidden;text-align:center}
+.pp-photo img{width:100%;height:100%;object-fit:cover}.pp-history-row{border-top:1px solid var(--border);padding:9px 0;font-size:11px;line-height:1.5}.pp-history-row:first-child{border-top:0}.pp-history-row strong{font-family:'Oswald',sans-serif;font-size:14px}
+.strength-section-locked{opacity:.42}.strength-section-locked .workout-head{cursor:not-allowed}
+.strength-lock-text{padding:0 14px 14px;color:var(--text-muted);font-size:10px;line-height:1.5}
+</style>
+<style>
+/* Feine ProjectP-Anpassungen */
+.home{text-align:center}
+.home .brand,.home .eyebrow,.home .quote,.home .home-actions,.home .next{margin-left:auto;margin-right:auto}
+.home .brand{padding-top:18px}
+.home .quote-author,.home-footer{font-size:8px;letter-spacing:.10em;line-height:1.8}.home-footer .akkol{font-size:8px;letter-spacing:.18em}
+.home .next-label{font-size:11px}
+.home .next-name{font-size:22px}
+.home .next-meta{font-size:11px}
+.strength-section-locked{opacity:.42}
+.strength-section-locked .workout-head{cursor:not-allowed}
+.strength-section-locked .workout-body{pointer-events:none}
+.strength-section-locked .complete-btn{display:none}
+</style>
 </head>
 <body>
 <div id="page-home" class="page active"><div class="shell home"><div>
 <div class="brand">PROJECT<span>P</span></div><div class="eyebrow">PERFORMANCE SYSTEM</div>
 <div class="quote"><div class="greeting" id="greeting"></div><div class="quote-text" id="quoteText"></div><div class="quote-author" id="quoteAuthor"></div></div>
 <div class="home-actions">
-<button class="nav-card" data-page="run"><div><div class="nav-kicker">RUN</div><div class="nav-title">Laufvorbereitung</div><div class="nav-desc">27 Wochen · strukturierter Trainingsplan</div></div><div class="nav-arrow">→</div></button>
-<button class="nav-card" data-page="strength"><div><div class="nav-kicker">STRENGTH</div><div class="nav-title">Krafttraining</div><div class="nav-desc">LOWER · PUSH &amp; PULL</div></div><div class="nav-arrow">→</div></button>
+<button class="nav-card" data-page="run"><div><div class="nav-kicker">LAUFEN</div><div class="nav-title">Laufvorbereitung</div><div class="nav-desc">27 Wochen · strukturierter Trainingsplan</div></div><div class="nav-arrow">→</div></button>
+<button class="nav-card" data-page="strength"><div><div class="nav-kicker">KRAFT</div><div class="nav-title">Krafttraining</div><div class="nav-desc">LOWER · PUSH &amp; PULL</div></div><div class="nav-arrow">→</div></button>
+<button class="nav-card" data-page="progression"><div><div class="nav-kicker">FORTSCHRITT</div><div class="nav-title">Fortschritt</div><div class="nav-desc">Wochen · Fotos · Körperdaten</div></div><div class="nav-arrow">→</div></button>
 </div>
-<div class="next"><div class="next-label">NEXT SESSION</div><div class="next-name" id="nextWorkoutName"></div><div class="next-meta" id="nextWorkoutMeta"></div></div>
-</div><div class="home-footer">PROJECTP · PERFORMANCE SYSTEM</div></div></div>
+<div class="next"><div class="next-label">NÄCHSTE EINHEIT</div><div class="next-name" id="nextWorkoutName"></div><div class="next-meta" id="nextWorkoutMeta"></div></div>
+</div><div class="home-footer">PROJECTP · PERFORMANCE SYSTEM<br><span class="akkol">AKKOL</span></div></div></div>
 
 <div id="page-run" class="page"><div class="shell"><div class="topbar"><button class="back" data-page="home">‹</button><div><div class="page-title">Laufvorbereitung</div><div class="page-sub">27 WOCHEN · 102 KM</div></div></div>
 <div class="wrap">
@@ -636,7 +670,47 @@ if ('serviceWorker' in navigator) {
 </script>
 </div></div>
 
-<div id="page-strength" class="page"><div class="shell"><div class="topbar"><button class="back" data-page="home">‹</button><div><div class="page-title">Krafttraining</div><div class="page-sub">PERSONAL STRENGTH SYSTEM</div></div></div><div class="strength-cycle" id="strengthCycle"></div><div id="strengthWorkouts"></div></div></div>
+<div id="page-progression" class="page"><div class="shell"><div class="topbar"><button class="back" data-page="home">‹</button><div><div class="page-title">PROGRESSION</div><div class="page-sub">UNABHÄNGIG VON RUN</div></div></div>
+<div class="pp-progression">
+  <div class="pp-prog-hero">
+    <div class="pp-label">PROGRESSION · EIGENE ZEITRECHNUNG</div>
+    <div class="pp-week" id="ppCurrentWeek">WOCHE 1</div>
+    <div class="pp-sub" id="ppWeekSub">Startdatum festlegen</div>
+  </div>
+  <div class="pp-card">
+    <div class="pp-card-title">Progressions-Start</div>
+    <div class="pp-muted">Das Startdatum beginnt Woche 1. Danach startet alle 7 Tage automatisch eine neue Woche. Die 27 RUN-Wochen haben keinen Einfluss darauf.</div>
+    <label class="pp-field"><span>STARTDATUM</span><input id="ppStartDate" type="date"></label>
+    <button class="pp-primary" id="ppSaveStart">Startdatum speichern</button>
+  </div>
+  <div class="pp-card">
+    <div class="pp-card-title" id="ppEntryTitle">Woche 1 · Körperdaten</div>
+    <div class="pp-grid">
+      <label><span>GEWICHT (KG)</span><input id="ppWeight" type="number" step=".1"></label>
+      <label><span>BAUCH (CM)</span><input id="ppWaist" type="number" step=".1"></label>
+      <label><span>BRUST (CM)</span><input id="ppChest" type="number" step=".1"></label>
+      <label><span>ARM (CM)</span><input id="ppArm" type="number" step=".1"></label>
+      <label class="wide"><span>OBERSCHENKEL (CM)</span><input id="ppThigh" type="number" step=".1"></label>
+    </div>
+    <button class="pp-primary" id="ppSaveData">Körperdaten dieser Woche speichern</button>
+  </div>
+  <div class="pp-card">
+    <div class="pp-card-title">Fotos · aktuelle Woche</div>
+    <div class="pp-muted">Jede Progressionswoche bekommt einen eigenen Satz aus Front, Seite und Rücken. Die Fotos älterer Wochen werden nicht überschrieben.</div>
+    <div class="pp-photos">
+      <label><span>FRONT</span><div class="pp-photo" id="ppFrontBox">📷</div><input id="ppFront" type="file" accept="image/*" capture="environment"></label>
+      <label><span>SEITE</span><div class="pp-photo" id="ppSideBox">📷</div><input id="ppSide" type="file" accept="image/*" capture="environment"></label>
+      <label><span>RÜCKEN</span><div class="pp-photo" id="ppBackBox">📷</div><input id="ppBack" type="file" accept="image/*" capture="environment"></label>
+    </div>
+  </div>
+  <div class="pp-card">
+    <div class="pp-card-title">Verlauf</div>
+    <div id="ppHistory" class="pp-history"></div>
+  </div>
+</div></div></div>
+
+
+<div id="page-strength" class="page"><div class="shell"><div class="topbar"><button class="back" data-page="home">‹</button><div><div class="page-title">Krafttraining</div><div class="page-sub">PERSÖNLICHES KRAFTSYSTEM</div></div></div><div class="strength-cycle" id="strengthCycle"></div><div id="strengthWorkouts"></div></div></div>
 
 <script>
 // ---------- Datenbasis (aus dem Trainingsplan) ----------
@@ -931,8 +1005,8 @@ function renderStrength(){
  document.getElementById('strengthCycle').textContent=strengthWorkouts.map(w=>w.name).join('  ·  ');
  const c=document.getElementById('strengthWorkouts');c.innerHTML='';
  strengthWorkouts.forEach(w=>{
-  const s=document.createElement('section');s.className='workout-section';s.dataset.workoutId=w.id;
-  const h=document.createElement('button');h.className='workout-head';
+  const s=document.createElement('section');s.className='workout-section';s.dataset.workoutId=w.id; if(w.id!==next.id)s.classList.add('strength-section-locked');
+  const h=document.createElement('button');h.className='workout-head';h.setAttribute('aria-expanded','false'); if(w.id!==next.id)h.setAttribute('aria-disabled','true');
   h.innerHTML='<span><small>KRAFTTRAINING</small><strong>'+w.name+'</strong></span><span class="chev">+</span>';
   const b=document.createElement('div');b.className='workout-body';
   w.exercises.forEach(ex=>{
@@ -945,7 +1019,7 @@ Array.from({length:Math.max(1,(st.setsData||[]).length)},(_,idx)=>{const v=st.se
    '<div class="progress-hint">'+(st.weight?'💡 Ergebnis speichern und später die Steigerung ableiten.':'💡 Noch kein Gewicht hinterlegt.')+'</div>';
    b.appendChild(card)
   });
-  const done=document.createElement('button');done.className='complete-btn';done.textContent=w.id===next.id?'✓ Training absolvieren & nächste Einheit setzen':'✓ Diese Einheit als absolviert markieren';
+  const done=document.createElement('button');done.className='complete-btn';done.textContent='✓ Training absolvieren & nächste Einheit setzen';done.disabled=w.id!==next.id;
   done.onclick=()=>{strengthState.lastCompleted=w.id;strengthState.lastCompletedAt=new Date().toISOString();saveStrength();renderStrength();updateHomeNext()};
   b.appendChild(done);h.onclick=()=>s.classList.toggle('open');s.append(h,b);c.appendChild(s)
  });
@@ -975,11 +1049,26 @@ c.querySelectorAll('[data-addset]').forEach(btn=>btn.onclick=()=>{
 function showPage(page){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');window.scrollTo(0,0);if(page==='strength')renderStrength()}
 
 const quotes=[
-['Discipline is the bridge between goals and accomplishment.','PROJECTP'],
-['The work is the work.','PROJECTP'],
-['Stay hard.','David Goggins']
+ ['Disziplin beginnt dort, wo die Motivation aufhört.','PROJECTP'],
+ ['Du musst nicht jeden Tag gewinnen. Du musst jeden Tag antreten.','PROJECTP'],
+ ['Mach die Arbeit. Auch dann, wenn niemand zusieht.','PROJECTP'],
+ ['Konstanz schlägt Intensität, wenn Intensität nicht von Dauer ist.','PROJECTP'],
+ ['Dein Ego ist dein Feind. Bleib bei der Aufgabe.','PROJECTP'],
+ ['Was du heute tust, bestimmt, wer du morgen bist.','PROJECTP'],
+ ['Fokus auf das, was du kontrollieren kannst.','PROJECTP'],
+ ['Nicht verhandeln. Ausführen.','PROJECTP'],
+ ['Disziplin ist die Entscheidung, das Richtige trotzdem zu tun.','PROJECTP'],
+ ['Ein schlechter Tag ist kein Grund, den Weg zu verlassen.','PROJECTP'],
+ ['Kleine Schritte. Jeden Tag. Ohne Ausreden.','PROJECTP'],
+ ['Trainiere nicht für den Moment. Trainiere für den Standard.','PROJECTP'],
+ ['Geduld. Disziplin. Wiederholung.','PROJECTP'],
+ ['Der Weg wird durch tägliche Arbeit gebaut.','PROJECTP'],
+ ['Werde besser, nicht beeindruckender.','PROJECTP'],
+ ['Kontrolle über dich selbst ist Stärke.','PROJECTP'],
+ ['Der nächste Schritt zählt. Dann der nächste.','PROJECTP'],
+ ['Ergebnisse kommen von dem, was du wiederholst.','PROJECTP']
 ];
-function setGreeting(){const h=new Date().getHours();document.getElementById('greeting').textContent=h<12?'GOOD MORNING':(h<18?'GOOD AFTERNOON':'GOOD EVENING');const q=quotes[Math.floor(Math.random()*quotes.length)];document.getElementById('quoteText').textContent='“'+q[0]+'”';document.getElementById('quoteAuthor').textContent='— '+q[1]}
+function setGreeting(){const h=new Date().getHours();document.getElementById('greeting').textContent=h<12?'GUTEN MORGEN':(h<18?'GUTEN TAG':'GUTEN ABEND');const q=quotes[Math.floor(Math.random()*quotes.length)];document.getElementById('quoteText').textContent='“'+q[0]+'”';document.getElementById('quoteAuthor').textContent='— '+q[1]}
 setGreeting();renderStrength();
 document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 function updateHomeNext(){const n=nextWorkout();document.getElementById('nextWorkoutName').textContent=n.name;document.getElementById('nextWorkoutMeta').textContent=n.exercises.length+' Übungen · als Nächstes fällig'}
@@ -1201,6 +1290,7 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
       e.preventDefault();
       e.stopPropagation();
       const sec = workout.closest('.workout-section');
+      if(sec && sec.classList.contains('strength-section-locked')) return;
       const open = !sec.classList.contains('open');
       sec.classList.toggle('open', open);
       workout.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -1219,4 +1309,39 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 })();
 </script>
 
+<script>
+(function(){
+  const PKEY='projectp-progression-v1';
+  function pstate(){try{return Object.assign({start:null,weeks:{}},JSON.parse(localStorage.getItem(PKEY)||'{}'))}catch(e){return {start:null,weeks:{}}}}
+  function psave(s){localStorage.setItem(PKEY,JSON.stringify(s))}
+  function pweek(){
+    const s=pstate(); if(!s.start)return 1;
+    const a=new Date(s.start+'T00:00:00'), b=new Date(); b.setHours(0,0,0,0);
+    return Math.max(1,Math.floor((b-a)/86400000/7)+1);
+  }
+  function pday(){
+    const s=pstate(); if(!s.start)return 1;
+    const a=new Date(s.start+'T00:00:00'), b=new Date(); b.setHours(0,0,0,0);
+    const days=Math.max(0,Math.floor((b-a)/86400000)); return (days%7)+1;
+  }
+  function loadWeek(){
+    const s=pstate(),w=pweek(),d=s.weeks[w]||{};
+    ppStartDate.value=s.start||'';
+    ppCurrentWeek.textContent='WOCHE '+w;
+    ppWeekSub.textContent=s.start?'TAG '+pday()+' VON 7 · START '+new Date(s.start+'T00:00:00').toLocaleDateString('de-DE'):'Startdatum festlegen';
+    ppEntryTitle.textContent='Woche '+w+' · Körperdaten';
+    ['Weight','Waist','Chest','Arm','Thigh'].forEach(k=>{const el=document.getElementById('pp'+k);if(el)el.value=d[k.toLowerCase()]||''});
+    [['Front','front'],['Side','side'],['Back','back']].forEach(([id,key])=>{const box=document.getElementById('pp'+id+'Box');box.innerHTML=d[key]?'<img src="'+d[key]+'" alt="">':'📷'});
+    renderHistory();
+  }
+  function saveStart(){if(!ppStartDate.value)return;const s=pstate();s.start=ppStartDate.value;psave(s);loadWeek()}
+  function saveData(){const s=pstate();if(!s.start){alert('Bitte zuerst ein Startdatum speichern.');return}const w=pweek();s.weeks[w]=Object.assign(s.weeks[w]||{},{weight:ppWeight.value,waist:ppWaist.value,chest:ppChest.value,arm:ppArm.value,thigh:ppThigh.value});psave(s);loadWeek()}
+  function savePhoto(key,file){if(!file)return;const s=pstate();if(!s.start){alert('Bitte zuerst ein Startdatum speichern.');return}const w=pweek(),r=new FileReader();r.onload=()=>{s.weeks[w]=Object.assign(s.weeks[w]||{}, {[key]:r.result});psave(s);loadWeek()};r.readAsDataURL(file)}
+  function renderHistory(){const el=document.getElementById('ppHistory'),s=pstate(),keys=Object.keys(s.weeks).map(Number).sort((a,b)=>a-b);if(!keys.length){el.innerHTML='<div class="pp-muted">Noch keine Woche gespeichert.</div>';return}el.innerHTML=keys.map(w=>{const d=s.weeks[w]||{},photos=[d.front,d.side,d.back].filter(Boolean).length;return '<div class="pp-history-row"><strong>Woche '+w+'</strong><br>Gewicht: '+(d.weight||'—')+' kg · Bauch: '+(d.waist||'—')+' cm<br>Brust: '+(d.chest||'—')+' cm · Arm: '+(d.arm||'—')+' cm · Oberschenkel: '+(d.thigh||'—')+' cm<br>'+photos+'/3 Fotos gespeichert</div>'}).join('')}
+  ppSaveStart.onclick=saveStart;ppSaveData.onclick=saveData;
+  [['ppFront','front'],['ppSide','side'],['ppBack','back']].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>savePhoto(key,e.target.files[0])));
+  loadWeek();
+
+  })();
+</script>
 </body></html>
