@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ProjectP">
-<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#090A0C;color:#F4F4F1;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif}
 .page{display:none;min-height:100vh}.page.active{display:block}.shell{max-width:520px;margin:auto;padding:env(safe-area-inset-top) 18px 42px}
@@ -127,18 +127,98 @@
 </style>
 
 <style>
-/* ProjectP final strength layout */
-.set-row{
-  display:grid !important;
-  grid-template-columns:24px minmax(0,1fr) 18px minmax(0,1fr) !important;
-  gap:8px !important;
-  align-items:center !important;
+/* ProjectP: KG + Wiederholungen nebeneinander */
+.pp-set-row,
+.set-row,
+.strength-set-row {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  align-items: end !important;
 }
-.set-row input{width:100% !important;min-width:0 !important;box-sizing:border-box !important}
-.add-set-btn{
-  font-size:11px !important;
-  padding:7px 10px !important;
-  margin:14px 0 10px !important;
+.pp-set-row > *,
+.set-row > *,
+.strength-set-row > * {
+  min-width: 0 !important;
+}
+.pp-set-row input,
+.set-row input,
+.strength-set-row input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+</style>
+
+
+<style>
+/* ProjectP: compact +Satz hinzufügen control with clear spacing */
+button.add-set,
+button[data-action="add-set"],
+.add-set,
+.add-set-btn,
+.set-add,
+button:has(+ .set-row) {
+  font-size: 12px !important;
+  padding: 7px 12px !important;
+  min-height: 0 !important;
+  margin-top: 14px !important;
+  margin-bottom: 10px !important;
+  border-radius: 8px !important;
+}
+</style>
+
+
+<style>
+/* FINAL ProjectP layout fixes */
+#kraftplanHead {
+  position: relative !important;
+  z-index: 5 !important;
+  pointer-events: auto !important;
+}
+#kraftplanSection .phase-body {
+  display: none;
+}
+#kraftplanSection.open .phase-body {
+  display: block;
+}
+
+/* Each set: number | KG | x | Wdh. */
+#strengthWorkouts .set-row {
+  display: grid !important;
+  grid-template-columns: 30px minmax(0,1fr) 18px minmax(0,1fr) !important;
+  gap: 8px !important;
+  align-items: center !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+#strengthWorkouts .set-row input {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+#strengthWorkouts .set-no {
+  text-align: center !important;
+}
+#strengthWorkouts .times {
+  text-align: center !important;
+}
+#strengthWorkouts .add-set-btn {
+  display: inline-block !important;
+  width: auto !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  padding: 6px 10px !important;
+  margin: 16px 0 12px !important;
+}
+</style>
+
+
+<style>
+/* Keep the current workout open after adding a set */
+#strengthWorkouts .workout-card.open,
+#strengthWorkouts .workout.open,
+#strengthWorkouts [data-open="true"] {
+  display: block;
 }
 </style>
 
@@ -851,7 +931,7 @@ function renderStrength(){
  document.getElementById('strengthCycle').textContent=strengthWorkouts.map(w=>w.name).join('  ·  ');
  const c=document.getElementById('strengthWorkouts');c.innerHTML='';
  strengthWorkouts.forEach(w=>{
-  const s=document.createElement('section');s.className='workout-section';
+  const s=document.createElement('section');s.className='workout-section';s.dataset.workoutId=w.id;
   const h=document.createElement('button');h.className='workout-head';
   h.innerHTML='<span><small>KRAFTTRAINING</small><strong>'+w.name+'</strong></span><span class="chev">+</span>';
   const b=document.createElement('div');b.className='workout-body';
@@ -870,26 +950,23 @@ Array.from({length:Math.max(1,(st.setsData||[]).length)},(_,idx)=>{const v=st.se
   b.appendChild(done);h.onclick=()=>s.classList.toggle('open');s.append(h,b);c.appendChild(s)
  });
  c.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{const st=exerciseState(i.dataset.id);if(i.dataset.set!==undefined){if(!st.setsData)st.setsData=[{weight:'',reps:''},{weight:'',reps:''},{weight:'',reps:''},{weight:'',reps:''}];const idx=Number(i.dataset.set);if(!st.setsData[idx])st.setsData[idx]={weight:'',reps:''};st.setsData[idx][i.dataset.field]=i.value;}saveStrength()}));
-c.querySelectorAll('[data-addset]').forEach(btn=>btn.onclick=(ev)=>{
- ev.preventDefault();
- const exId=btn.dataset.addset;
- const st=exerciseState(exId);
- if(!st.setsData)st.setsData=[{weight:'',reps:''}];
+c.querySelectorAll('[data-addset]').forEach(btn=>btn.onclick=()=>{
+ const current=btn.closest('.workout-section');
+ window.__projectpOpenWorkoutId=current ? current.dataset.workoutId : null;
+ const st=exerciseState(btn.dataset.addset);
+ if(!st.setsData)st.setsData=[];
  st.setsData.push({weight:'',reps:''});
- const list=btn.parentElement.querySelector('[data-sets="'+exId+'"]');
- const idx=st.setsData.length-1;
- const row=document.createElement('div');
- row.className='set-row';
- row.innerHTML='<span class="set-no">'+(idx+1)+'</span><input data-id="'+exId+'" data-set="'+idx+'" data-field="weight" value="" placeholder="kg"><span class="times">×</span><input data-id="'+exId+'" data-set="'+idx+'" data-field="reps" value="" placeholder="Wdh.">';
- list.appendChild(row);
- row.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{
-   const s=exerciseState(i.dataset.id);
-   const n=Number(i.dataset.set);
-   if(!s.setsData[n])s.setsData[n]={weight:'',reps:''};
-   s.setsData[n][i.dataset.field]=i.value;
-   saveStrength();
- }));
  saveStrength();
+ renderStrength();
+ requestAnimationFrame(()=>{
+   const id=window.__projectpOpenWorkoutId;
+   if(!id)return;
+   const sec=document.querySelector('#strengthWorkouts .workout-section[data-workout-id="'+id+'"]');
+   if(!sec)return;
+   sec.classList.add('open');
+   const head=sec.querySelector('.workout-head');
+   if(head)head.setAttribute('aria-expanded','true');
+ });
 });
  c.querySelectorAll('[data-video]').forEach(x=>x.onclick=()=>alert('Für diese Übung ist noch kein Video hinterlegt. Später kann das YouTube-Video direkt in ProjectP eingebettet werden.'));
  c.querySelectorAll('[data-alt]').forEach(x=>x.onclick=()=>alert('Alternativen können wir pro Übung hinterlegen.'));
@@ -924,4 +1001,222 @@ function loadRunKraft(){try{var raw=localStorage.getItem(RUN_KRAFT_STORAGE);if(r
 var kh=document.getElementById('kraftplanHead');if(kh)kh.addEventListener('click',function(){var s=document.getElementById('kraftplanSection');s.classList.toggle('open');kh.setAttribute('aria-expanded',s.classList.contains('open')?'true':'false')});
 loadRunKraft();
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function bindKraftButtons() {
+    document.querySelectorAll('button').forEach(function(btn) {
+      const label = (btn.textContent || '').trim().toLowerCase();
+      if (!label.includes('kraftplan')) return;
+      if (btn.dataset.ppKraftBound === '1') return;
+
+      btn.dataset.ppKraftBound = '1';
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        // Try the common next-sibling/content patterns first.
+        let target = btn.nextElementSibling;
+        if (!target) return;
+
+        const isHidden = getComputedStyle(target).display === 'none' ||
+                         target.hidden ||
+                         target.style.display === 'none';
+
+        target.hidden = !isHidden;
+        target.style.display = isHidden ? '' : 'none';
+
+        btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+      }, true);
+    });
+  }
+
+  bindKraftButtons();
+  new MutationObserver(bindKraftButtons).observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function compactAddSetButtons() {
+    document.querySelectorAll('button').forEach(function(btn) {
+      const t = (btn.textContent || '').trim().toLowerCase();
+      if (t.includes('satz hinzufügen') || t.includes('satz hinzuf')) {
+        btn.style.fontSize = '12px';
+        btn.style.padding = '7px 12px';
+        btn.style.minHeight = '0';
+        btn.style.marginTop = '14px';
+        btn.style.marginBottom = '10px';
+        btn.style.borderRadius = '8px';
+      }
+    });
+  }
+  compactAddSetButtons();
+  new MutationObserver(compactAddSetButtons).observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const kraft = document.getElementById('kraftplanHead');
+  const section = document.getElementById('kraftplanSection');
+
+  if (kraft && section) {
+    kraft.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const open = section.classList.toggle('open');
+      kraft.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }, false);
+  }
+
+  // Keep the strength set row layout stable after every render.
+  function fixStrengthRows() {
+    document.querySelectorAll('#strengthWorkouts .set-row').forEach(function(row) {
+      row.style.display = 'grid';
+      row.style.gridTemplateColumns = '30px minmax(0,1fr) 18px minmax(0,1fr)';
+      row.style.gap = '8px';
+      row.style.alignItems = 'center';
+    });
+    document.querySelectorAll('#strengthWorkouts .add-set-btn').forEach(function(btn) {
+      btn.style.fontSize = '11px';
+      btn.style.padding = '6px 10px';
+      btn.style.margin = '16px 0 12px';
+      btn.style.width = 'auto';
+    });
+  }
+  fixStrengthRows();
+  new MutationObserver(fixStrengthRows).observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Remember which strength workout is open before "+ Satz hinzufügen"
+  // causes the existing renderer to rebuild the section.
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const label = (btn.textContent || '').trim().toLowerCase();
+    if (!label.includes('satz hinzufügen') && !label.includes('satz hinzuf')) return;
+
+    const container = document.getElementById('strengthWorkouts');
+    if (!container) return;
+
+    const open = container.querySelector('.workout-card.open, .workout.open, [data-open="true"]');
+    if (open) {
+      const id = open.dataset.workout || open.dataset.id || open.id || '';
+      window.__projectpOpenWorkout = id;
+    } else {
+      // Find the nearest workout/card from the clicked button.
+      const card = btn.closest('.workout-card, .workout, [data-workout], [data-id]');
+      if (card) {
+        window.__projectpOpenWorkout =
+          card.dataset.workout || card.dataset.id || card.id || '';
+      }
+    }
+
+    // The original "+ Satz hinzufügen" handler rerenders the whole section.
+    // Restore the previously open card on the next frame(s).
+    setTimeout(function restoreOpenWorkout() {
+      const id = window.__projectpOpenWorkout;
+      if (!id) return;
+      const root = document.getElementById('strengthWorkouts');
+      if (!root) return;
+
+      let card = root.querySelector('[data-workout="' + CSS.escape(id) + '"], [data-id="' + CSS.escape(id) + '"], #' + CSS.escape(id));
+      if (!card) return;
+
+      const head = card.querySelector('.workout-head, .workout-header, .accordion-head, button');
+      card.classList.add('open');
+      card.dataset.open = 'true';
+      const body = card.querySelector('.workout-body, .workout-content, .accordion-body');
+      if (body) {
+        body.hidden = false;
+        body.style.display = '';
+      }
+      if (head) head.setAttribute('aria-expanded', 'true');
+    }, 0);
+    setTimeout(restoreOpenWorkout, 50);
+    setTimeout(restoreOpenWorkout, 150);
+  }, true);
+});
+</script>
+
+
+<style>
+/* Robust interaction layer */
+button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.phase-head, .workout-head, .nav-card, .add-set-btn { pointer-events:auto !important; }
+</style>
+<script>
+(function(){
+  function togglePhase(head, section){
+    if(!head || !section) return;
+    const open = !section.classList.contains('open');
+    section.classList.toggle('open', open);
+    head.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  document.addEventListener('click', function(e){
+    const nav = e.target.closest('button.nav-card[data-page]');
+    if(nav){
+      e.preventDefault();
+      e.stopPropagation();
+      const page = nav.getAttribute('data-page');
+      if(typeof showPage === 'function') showPage(page);
+      return;
+    }
+
+    const kraft = e.target.closest('#kraftplanHead');
+    if(kraft){
+      e.preventDefault();
+      e.stopPropagation();
+      togglePhase(kraft, document.getElementById('kraftplanSection'));
+      return;
+    }
+
+    const phase = e.target.closest('#phases .phase-head');
+    if(phase){
+      e.preventDefault();
+      e.stopPropagation();
+      togglePhase(phase, phase.closest('.phase'));
+      return;
+    }
+
+    const workout = e.target.closest('#strengthWorkouts .workout-head');
+    if(workout){
+      e.preventDefault();
+      e.stopPropagation();
+      const sec = workout.closest('.workout-section');
+      const open = !sec.classList.contains('open');
+      sec.classList.toggle('open', open);
+      workout.setAttribute('aria-expanded', open ? 'true' : 'false');
+      return;
+    }
+
+    const add = e.target.closest('#strengthWorkouts .add-set-btn');
+    if(add){
+      // The native handler is responsible for adding the set and rerendering.
+      // Remember the workout so the next frame can restore it.
+      const sec = add.closest('.workout-section');
+      window.__projectpOpenWorkoutId = sec ? sec.dataset.workoutId : null;
+      return;
+    }
+  }, true);
+})();
+</script>
+
 </body></html>
