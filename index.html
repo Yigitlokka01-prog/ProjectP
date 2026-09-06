@@ -739,16 +739,16 @@ if ('serviceWorker' in navigator) {
     <div class="pp-card-title">Progressions-Start</div>
     <div class="pp-muted">Das Startdatum beginnt Woche 1. Danach startet alle 7 Tage automatisch eine neue Woche. Die 27 RUN-Wochen haben keinen Einfluss darauf.</div>
     <label class="pp-field"><span>STARTDATUM</span><input id="ppStartDate" type="date"></label>
-    <button class="pp-primary" id="ppSaveStart">Startdatum speichern</button>
+    <button class="pp-primary" id="ppSaveStart">Startdatum speichern</button><div id="ppStartSaved" style="display:none;margin-top:8px;font-size:11px;color:#8B9199;text-align:center;">✓ Startdatum gespeichert</div>
   </div>
   <div class="pp-card">
-    <div class="pp-card-title" id="ppEntryTitle">Woche 1 · Körperdaten</div>
+    <div class="pp-card-title" id="ppEntryTitle">Woche 1 · Körperdaten</div><div id="ppDataRequiredHint" class="pp-muted" style="margin-top:-2px;margin-bottom:12px;">Bitte alle Körperdaten ausfüllen. Erst wenn alle Felder ausgefüllt sind, können die Daten gespeichert werden.</div>
     <div class="pp-grid">
-      <label><span>GEWICHT (KG)</span><input id="ppWeight" type="number" step=".1"></label>
-      <label><span>BAUCH (CM)</span><input id="ppWaist" type="number" step=".1"></label>
-      <label><span>BRUST (CM)</span><input id="ppChest" type="number" step=".1"></label>
-      <label><span>ARM (CM)</span><input id="ppArm" type="number" step=".1"></label>
-      <label class="wide"><span>OBERSCHENKEL (CM)</span><input id="ppThigh" type="number" step=".1"></label>
+      <label><span>GEWICHT (KG)</span><input id="ppWeight" type="number" step=".1" required></label>
+      <label><span>BAUCH (CM)</span><input id="ppWaist" type="number" step=".1" required></label>
+      <label><span>BRUST (CM)</span><input id="ppChest" type="number" step=".1" required></label>
+      <label><span>ARM (CM)</span><input id="ppArm" type="number" step=".1" required></label>
+      <label class="wide"><span>OBERSCHENKEL (CM)</span><input id="ppThigh" type="number" step=".1" required></label>
     </div>
     <button class="pp-primary" id="ppSaveData">Körperdaten dieser Woche speichern</button>
   </div>
@@ -1434,9 +1434,84 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     ['Weight','Waist','Chest','Arm','Thigh'].forEach(k=>{const el=document.getElementById('pp'+k);if(el)el.value=d[k.toLowerCase()]||''});
     [['Front','front'],['Side','side'],['Back','back']].forEach(([id,key])=>{const box=document.getElementById('pp'+id+'Box');box.innerHTML=d[key]?'<img src="'+d[key]+'" alt="">':'📷'});
     renderHistory();
+    renderWeightChart();
   }
+
+  function renderWeightChart(){
+    const el=document.getElementById('ppWeightChart');
+    if(!el)return;
+    const s=pstate();
+    const points=Object.keys(s.weeks).map(Number).sort((a,b)=>a-b)
+      .map(function(w){return {week:w,weight:parseFloat(s.weeks[w]&&s.weeks[w].weight)}})
+      .filter(function(x){return Number.isFinite(x.weight)});
+    if(!points.length){
+      el.innerHTML='<div class="pp-muted" style="margin:0;">Noch kein Gewicht gespeichert.</div>';
+      return;
+    }
+
+    const W=460,H=210,PL=42,PR=14,PT=18,PB=38;
+    const cw=W-PL-PR,ch=H-PT-PB;
+    const vals=points.map(function(p){return p.weight});
+    let min=Math.min.apply(null,vals),max=Math.max.apply(null,vals);
+    if(min===max){min-=1;max+=1;}
+    const pad=(max-min)*0.18;
+    min-=pad;max+=pad;
+    const x=function(i){return points.length===1?PL+cw/2:PL+(i/(points.length-1))*cw};
+    const y=function(v){return PT+(max-v)/(max-min)*ch};
+    const line=points.map(function(p,i){return (i?'L':'M')+' '+x(i).toFixed(1)+' '+y(p.weight).toFixed(1)}).join(' ');
+    const circles=points.map(function(p,i){
+      return '<circle cx="'+x(i).toFixed(1)+'" cy="'+y(p.weight).toFixed(1)+'" r="3.5" fill="currentColor"></circle>';
+    }).join('');
+    const labels=points.map(function(p,i){
+      if(points.length>8 && i%Math.ceil(points.length/8)!==0 && i!==points.length-1)return '';
+      return '<text x="'+x(i).toFixed(1)+'" y="'+(H-14)+'" text-anchor="middle" font-size="10" fill="currentColor" opacity=".65">W'+p.week+'</text>';
+    }).join('');
+    const start=points[0].weight;
+    const last=points[points.length-1].weight;
+    const delta=last-start;
+    const deltaText=(delta>0?'+':'')+delta.toFixed(1)+' kg';
+    const direction=delta<0?'↓':(delta>0?'↑':'→');
+
+    el.innerHTML=
+      '<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Start: <strong style="color:var(--text);">'+start.toFixed(1)+' kg</strong> · Aktuell: <strong style="color:var(--text);">'+last.toFixed(1)+' kg</strong> · '+direction+' '+deltaText+'</div>'+
+      '<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="210" role="img" aria-label="Gewichtsverlauf">'+
+        '<line x1="'+PL+'" y1="'+PT+'" x2="'+PL+'" y2="'+(H-PB)+'" stroke="currentColor" opacity=".18"></line>'+
+        '<line x1="'+PL+'" y1="'+(H-PB)+'" x2="'+(W-PR)+'" y2="'+(H-PB)+'" stroke="currentColor" opacity=".18"></line>'+
+        '<path d="'+line+'" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>'+
+        circles+labels+
+      '</svg>';
+  }
+
   function saveStart(){if(!ppStartDate.value)return;const s=pstate();s.start=ppStartDate.value;psave(s);loadWeek()}
-  function saveData(){const s=pstate();if(!s.start){alert('Bitte zuerst ein Startdatum speichern.');return}const w=pweek();s.weeks[w]=Object.assign(s.weeks[w]||{},{weight:ppWeight.value,waist:ppWaist.value,chest:ppChest.value,arm:ppArm.value,thigh:ppThigh.value});psave(s);loadWeek()}
+  function saveData(){
+    const s=pstate();
+    if(!s.start){alert('Bitte zuerst ein Startdatum speichern.');return}
+    const fields=[
+      ['Gewicht',ppWeight],['Bauch',ppWaist],['Brust',ppChest],
+      ['Arm',ppArm],['Oberschenkel',ppThigh]
+    ];
+    const missing=fields.filter(function(x){return !String(x[1].value||'').trim()});
+    if(missing.length){
+      const names=missing.map(function(x){return x[0]}).join(', ');
+      alert('Bitte alle Körperdaten ausfüllen. Es fehlen: '+names+'.');
+      missing[0][1].focus();
+      return;
+    }
+    const w=pweek();
+    s.weeks[w]=Object.assign(s.weeks[w]||{},{
+      weight:ppWeight.value,waist:ppWaist.value,chest:ppChest.value,
+      arm:ppArm.value,thigh:ppThigh.value
+    });
+    psave(s);
+    loadWeek();
+    alert('✓ Körperdaten gespeichert.');
+    const msg=document.getElementById('ppStartSaved');
+    if(msg){
+      msg.style.display='block';
+      clearTimeout(window.__ppStartSavedTimer);
+      window.__ppStartSavedTimer=setTimeout(function(){msg.style.display='none'},2500);
+    }
+  }
   function savePhoto(key,file){if(!file)return;const s=pstate();if(!s.start){alert('Bitte zuerst ein Startdatum speichern.');return}const w=pweek(),r=new FileReader();r.onload=()=>{s.weeks[w]=Object.assign(s.weeks[w]||{}, {[key]:r.result});psave(s);loadWeek()};r.readAsDataURL(file)}
   function renderHistory(){const el=document.getElementById('ppHistory'),s=pstate(),keys=Object.keys(s.weeks).map(Number).sort((a,b)=>a-b);if(!keys.length){el.innerHTML='<div class="pp-muted">Noch keine Woche gespeichert.</div>';return}el.innerHTML=keys.map(w=>{const d=s.weeks[w]||{},photos=[d.front,d.side,d.back].filter(Boolean).length;return '<div class="pp-history-row"><strong>Woche '+w+'</strong><br>Gewicht: '+(d.weight||'—')+' kg · Bauch: '+(d.waist||'—')+' cm<br>Brust: '+(d.chest||'—')+' cm · Arm: '+(d.arm||'—')+' cm · Oberschenkel: '+(d.thigh||'—')+' cm<br>'+photos+'/3 Fotos gespeichert</div>'}).join('')}
   ppSaveStart.onclick=saveStart;ppSaveData.onclick=saveData;
@@ -1590,4 +1665,45 @@ document.addEventListener('click',function(e){
    window.open('https://www.youtube.com/watch?v=HIKzvHkibWc&t=20s','_blank','noopener,noreferrer');
  }
 },true);
-</script></body></html>
+</script><script>
+(function(){
+  var input=document.getElementById('ppStartDate');
+  if(!input)return;
+  input.addEventListener('change',function(){
+    this.blur();
+  });
+})();
+</script>
+
+<script>
+(function(){
+  var btn = document.getElementById('ppSaveStart');
+  var date = document.getElementById('ppStartDate');
+  if(!btn || !date) return;
+
+  function setChangedState(){
+    btn.style.background = '#2E9B57';
+    btn.style.borderColor = '#2E9B57';
+    btn.style.color = '#fff';
+  }
+
+  function setSavedState(){
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }
+
+  // Sobald ein Datum geändert/ausgewählt wurde: Button grün.
+  date.addEventListener('input', setChangedState);
+  date.addEventListener('change', setChangedState);
+
+  // Nach dem Speichern: wieder Standardfarbe.
+  btn.addEventListener('click', function(){
+    setTimeout(function(){
+      if(date.value) setSavedState();
+    }, 0);
+  });
+})();
+</script>
+
+</body></html>
