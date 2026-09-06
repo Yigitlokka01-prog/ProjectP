@@ -246,7 +246,7 @@ button:has(+ .set-row) {
 .pp-primary{width:100%;margin-top:10px;border:1px solid var(--border);border-radius:7px;background:var(--surface-2);color:var(--text);padding:9px;font-size:11px}
 .pp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pp-grid .wide{grid-column:1/-1}
 .pp-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.pp-photos label>span{display:block;font-size:8px;letter-spacing:.12em;color:var(--text-muted);margin-bottom:5px}
-.pp-photo-actions{display:flex;gap:4px;margin-top:5px}.pp-photo-btn{flex:1;padding:7px 2px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2,#20232a);color:var(--text);font-size:8px}.pp-photo-btn:active{opacity:.7}.pp-photos>div>span{display:block;font-size:8px;letter-spacing:.12em;color:var(--text-muted);margin-bottom:5px}.pp-photos input{display:none}.pp-photo{aspect-ratio:3/4;border:1px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px;overflow:hidden;text-align:center}
+.pp-photos input{display:none}.pp-photo{cursor:pointer;touch-action:manipulation;aspect-ratio:3/4;border:1px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px;overflow:hidden;text-align:center}
 .pp-photo img{width:100%;height:100%;object-fit:cover}.pp-history-row{border-top:1px solid var(--border);padding:9px 0;font-size:11px;line-height:1.5}.pp-history-row:first-child{border-top:0}.pp-history-row strong{font-family:'Oswald',sans-serif;font-size:14px}
 .strength-section-locked{opacity:.42}.strength-section-locked .workout-head{cursor:not-allowed}
 .strength-lock-text{padding:0 14px 14px;color:var(--text-muted);font-size:10px;line-height:1.5}
@@ -756,15 +756,24 @@ if ('serviceWorker' in navigator) {
     <div class="pp-card-title">Fotos · aktuelle Woche</div>
     <div class="pp-muted">Jede Progressionswoche bekommt einen eigenen Satz aus Front, Seite und Rücken. Die Fotos älterer Wochen werden nicht überschrieben.</div>
     <div class="pp-photos">
-      <div><span>FRONT</span><div class="pp-photo" id="ppFrontBox">📷</div>
-        <div class="pp-photo-actions"><button type="button" class="pp-photo-btn" data-camera="ppFrontCamera">📷 Kamera</button><button type="button" class="pp-photo-btn" data-gallery="ppFrontGallery">🖼 Galerie</button></div>
-        <input id="ppFrontCamera" type="file" accept="image/*" capture="environment"><input id="ppFrontGallery" type="file" accept="image/*"></div>
-      <div><span>SEITE</span><div class="pp-photo" id="ppSideBox">📷</div>
-        <div class="pp-photo-actions"><button type="button" class="pp-photo-btn" data-camera="ppSideCamera">📷 Kamera</button><button type="button" class="pp-photo-btn" data-gallery="ppSideGallery">🖼 Galerie</button></div>
-        <input id="ppSideCamera" type="file" accept="image/*" capture="environment"><input id="ppSideGallery" type="file" accept="image/*"></div>
-      <div><span>RÜCKEN</span><div class="pp-photo" id="ppBackBox">📷</div>
-        <div class="pp-photo-actions"><button type="button" class="pp-photo-btn" data-camera="ppBackCamera">📷 Kamera</button><button type="button" class="pp-photo-btn" data-gallery="ppBackGallery">🖼 Galerie</button></div>
-        <input id="ppBackCamera" type="file" accept="image/*" capture="environment"><input id="ppBackGallery" type="file" accept="image/*"></div>
+      <div>
+        <span>FRONT</span>
+        <div class="pp-photo" id="ppFrontBox" data-photo-key="front">📷</div>
+        <input id="ppFrontCamera" type="file" accept="image/*" capture="environment">
+        <input id="ppFrontGallery" type="file" accept="image/*">
+      </div>
+      <div>
+        <span>SEITE</span>
+        <div class="pp-photo" id="ppSideBox" data-photo-key="side">📷</div>
+        <input id="ppSideCamera" type="file" accept="image/*" capture="environment">
+        <input id="ppSideGallery" type="file" accept="image/*">
+      </div>
+      <div>
+        <span>RÜCKEN</span>
+        <div class="pp-photo" id="ppBackBox" data-photo-key="back">📷</div>
+        <input id="ppBackCamera" type="file" accept="image/*" capture="environment">
+        <input id="ppBackGallery" type="file" accept="image/*">
+      </div>
     </div>
   </div>
   <div class="pp-card">
@@ -1438,7 +1447,7 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     ppWeekSub.textContent=s.start?'TAG '+pday()+' VON 7 · START '+new Date(s.start+'T00:00:00').toLocaleDateString('de-DE'):'Startdatum festlegen';
     ppEntryTitle.textContent='Woche '+w+' · Körperdaten';
     ['Weight','Waist','Chest','Arm','Thigh'].forEach(k=>{const el=document.getElementById('pp'+k);if(el)el.value=d[k.toLowerCase()]||''});
-    [['Front','front'],['Side','side'],['Back','back']].forEach(([id,key])=>{const box=document.getElementById('pp'+id+'Box');box.innerHTML=d[key]?'<img src="'+d[key]+'" alt="">':'📷'});
+    renderProgressPhotos(w);
     renderHistory();
     renderWeightChart();
   }
@@ -1518,84 +1527,161 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
       window.__ppStartSavedTimer=setTimeout(function(){msg.style.display='none'},2500);
     }
   }
-  function savePhoto(key,file){if(!file)return;const s=pstate();if(!s.start){alert('Bitte zuerst ein Startdatum speichern.');return}const w=pweek(),r=new FileReader();r.onload=()=>{s.weeks[w]=Object.assign(s.weeks[w]||{}, {[key]:r.result});psave(s);loadWeek()};r.readAsDataURL(file)}
+  const PP_PHOTO_DB='projectp-progression-photos-v2';
+  let ppPhotoDBPromise=null;
+  function ppPhotoDB(){
+    if(ppPhotoDBPromise)return ppPhotoDBPromise;
+    ppPhotoDBPromise=new Promise(function(resolve,reject){
+      const req=indexedDB.open(PP_PHOTO_DB,1);
+      req.onupgradeneeded=function(){req.result.createObjectStore('photos',{keyPath:'id'})};
+      req.onsuccess=function(){resolve(req.result)};
+      req.onerror=function(){reject(req.error)};
+    });
+    return ppPhotoDBPromise;
+  }
+  function ppPhotoId(week,key){return String(week)+'-'+key}
+  async function ppPhotoPut(week,key,file){
+    const db=await ppPhotoDB();
+    await new Promise(function(resolve,reject){
+      const tx=db.transaction('photos','readwrite');
+      tx.objectStore('photos').put({id:ppPhotoId(week,key),week:week,key:key,blob:file});
+      tx.oncomplete=resolve; tx.onerror=function(){reject(tx.error)};
+    });
+  }
+  async function ppPhotoGet(week,key){
+    const db=await ppPhotoDB();
+    return await new Promise(function(resolve,reject){
+      const tx=db.transaction('photos','readonly'), req=tx.objectStore('photos').get(ppPhotoId(week,key));
+      req.onsuccess=function(){resolve(req.result||null)}; req.onerror=function(){reject(req.error)};
+    });
+  }
+  async function ppPhotoDelete(week,key){
+    const db=await ppPhotoDB();
+    await new Promise(function(resolve,reject){
+      const tx=db.transaction('photos','readwrite');
+      tx.objectStore('photos').delete(ppPhotoId(week,key));
+      tx.oncomplete=resolve; tx.onerror=function(){reject(tx.error)};
+    });
+  }
+  async function ppPhotoHas(week,key){
+    return !!(await ppPhotoGet(week,key));
+  }
+
+  async function migrateOldProgressPhotos(){
+    const s=pstate(), keys=Object.keys(s.weeks||{});
+    let changed=false;
+    for(const w of keys){
+      const d=s.weeks[w]||{};
+      for(const key of ['front','side','back']){
+        if(typeof d[key]==='string' && d[key].indexOf('data:image/')===0){
+          try{
+            const res=await fetch(d[key]);
+            const blob=await res.blob();
+            await ppPhotoPut(Number(w),key,blob);
+            delete d[key];
+            changed=true;
+          }catch(e){}
+        }
+      }
+    }
+    if(changed)psave(s);
+  }
+
+  async function renderProgressPhotos(week){
+    const pairs=[['Front','front'],['Side','side'],['Back','back']];
+    for(const [id,key] of pairs){
+      const box=document.getElementById('pp'+id+'Box');
+      if(!box)continue;
+      const oldUrl=box.dataset.objectUrl;
+      if(oldUrl){try{URL.revokeObjectURL(oldUrl)}catch(e){}}
+      box.dataset.objectUrl='';
+      try{
+        const rec=await ppPhotoGet(week,key);
+        if(rec && rec.blob){
+          const url=URL.createObjectURL(rec.blob);
+          box.dataset.objectUrl=url;
+          box.innerHTML='<img src="'+url+'" alt="'+id+' Foto">';
+          box.classList.add('has-photo');
+        }else{
+          box.innerHTML='📷';
+          box.classList.remove('has-photo');
+        }
+      }catch(e){
+        box.innerHTML='📷';
+        box.classList.remove('has-photo');
+      }
+    }
+    renderHistory();
+  }
+
+  function choosePhotoSource(key,week){
+    const camera=document.getElementById('pp'+key.charAt(0).toUpperCase()+key.slice(1)+'Camera');
+    const gallery=document.getElementById('pp'+key.charAt(0).toUpperCase()+key.slice(1)+'Gallery');
+    if(!camera||!gallery)return;
+    const useCamera=window.confirm('Kamera öffnen?\n\nOK = Kamera\nAbbrechen = Galerie');
+    const input=useCamera?camera:gallery;
+    input.value='';
+    input.click();
+  }
+
+  async function savePhoto(key,file){
+    if(!file)return;
+    const s=pstate();
+    if(!s.start){alert('Bitte zuerst ein Startdatum speichern.');return}
+    const w=pweek();
+    try{
+      await ppPhotoPut(w,key,file);
+      await renderProgressPhotos(w);
+    }catch(e){
+      alert('Das Foto konnte nicht gespeichert werden. Bitte erneut versuchen.');
+    }
+  }
+
+  async function showPhotoPreview(key,week){
+    const rec=await ppPhotoGet(week,key);
+    if(!rec||!rec.blob){
+      choosePhotoSource(key,week);
+      return;
+    }
+    const url=URL.createObjectURL(rec.blob);
+    const title=key==='front'?'FRONT':key==='side'?'SEITE':'RÜCKEN';
+    const modal=document.createElement('div');
+    modal.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+    modal.innerHTML='<div style="width:min(92vw,430px);text-align:center;"><div style="font-size:11px;letter-spacing:.14em;color:#fff;margin-bottom:10px;">'+title+'</div><img src="'+url+'" alt="'+title+' Vorschau" style="max-width:100%;max-height:68vh;border-radius:10px;object-fit:contain;display:block;margin:auto;"><div style="display:flex;gap:8px;margin-top:14px;"><button type="button" data-del style="flex:1;padding:12px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:#b53a3a;color:#fff;font-size:12px;">Foto löschen</button><button type="button" data-close style="flex:1;padding:12px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:#25282f;color:#fff;font-size:12px;">Schließen</button></div></div>';
+    document.body.appendChild(modal);
+    const close=function(){URL.revokeObjectURL(url);modal.remove()};
+    modal.querySelector('[data-close]').onclick=close;
+    modal.querySelector('[data-del]').onclick=async function(){
+      if(!window.confirm('Dieses Foto wirklich löschen?'))return;
+      await ppPhotoDelete(week,key);
+      close();
+      await renderProgressPhotos(week);
+    };
+    modal.addEventListener('click',function(e){if(e.target===modal)close()});
+  }
+
+  async function bindProgressPhotoBoxes(){
+    const pairs=[['Front','front'],['Side','side'],['Back','back']];
+    pairs.forEach(function([id,key]){
+      const box=document.getElementById('pp'+id+'Box');
+      if(box && box.dataset.bound!=='1'){
+        box.dataset.bound='1';
+        box.addEventListener('click',async function(){
+          const w=pweek();
+          const rec=await ppPhotoGet(w,key);
+          if(rec&&rec.blob) showPhotoPreview(key,w);
+          else choosePhotoSource(key,w);
+        });
+      }
+      const camera=document.getElementById('pp'+id+'Camera');
+      const gallery=document.getElementById('pp'+id+'Gallery');
+      if(camera && camera.dataset.bound!=='1'){camera.dataset.bound='1';camera.addEventListener('change',e=>savePhoto(key,e.target.files[0]))}
+      if(gallery && gallery.dataset.bound!=='1'){gallery.dataset.bound='1';gallery.addEventListener('change',e=>savePhoto(key,e.target.files[0]))}
+    });
+  }
   function renderHistory(){const el=document.getElementById('ppHistory'),s=pstate(),keys=Object.keys(s.weeks).map(Number).sort((a,b)=>a-b);if(!keys.length){el.innerHTML='<div class="pp-muted">Noch keine Woche gespeichert.</div>';return}el.innerHTML=keys.map(w=>{const d=s.weeks[w]||{},photos=[d.front,d.side,d.back].filter(Boolean).length;return '<div class="pp-history-row"><strong>Woche '+w+'</strong><br>Gewicht: '+(d.weight||'—')+' kg · Bauch: '+(d.waist||'—')+' cm<br>Brust: '+(d.chest||'—')+' cm · Arm: '+(d.arm||'—')+' cm · Oberschenkel: '+(d.thigh||'—')+' cm<br>'+photos+'/3 Fotos gespeichert</div>'}).join('')}
   ppSaveStart.onclick=saveStart;ppSaveData.onclick=saveData;
-  [
-  ['ppFrontCamera','ppFrontGallery','front'],
-  ['ppSideCamera','ppSideGallery','side'],
-  ['ppBackCamera','ppBackGallery','back']
-].forEach(([cameraId,galleryId,key])=>{
-  const camera=document.getElementById(cameraId), gallery=document.getElementById(galleryId);
-  if(camera) camera.addEventListener('change',e=>savePhoto(key,e.target.files[0]));
-  if(gallery) gallery.addEventListener('change',e=>savePhoto(key,e.target.files[0]));
-});
-document.querySelectorAll('[data-camera]').forEach(btn=>btn.addEventListener('click',()=>{
-  const input=document.getElementById(btn.dataset.camera); if(input) input.click();
-}));
-document.querySelectorAll('[data-gallery]').forEach(btn=>btn.addEventListener('click',()=>{
-  const input=document.getElementById(btn.dataset.gallery); if(input) input.click();
-}));
-document.querySelectorAll('.pp-photo').forEach(box=>box.addEventListener('click',()=>{
-  const gallery=box.parentElement.querySelector('[data-gallery]'); if(gallery) gallery.click();
-}));
-  loadWeek();
-
-  })();
-</script>
-
-
-
-
-
-
-
-
-
-<script id="projectp-note-system">
-(function(){
-  const KEY='projectp-strength-v1';
-  const SHARED_KEY='projectp-shared-notes-v1';
-
-  function loadShared(){
-    try{return JSON.parse(localStorage.getItem(SHARED_KEY)||'{}')}catch(e){return {}}
-  }
-  function saveShared(s){localStorage.setItem(SHARED_KEY,JSON.stringify(s))}
-
-  // Canonical key = exercise name, normalized. Every occurrence of the same
-  // exercise therefore reads/writes the exact same note.
-  function keyFor(card){
-    const el=card.querySelector('.exercise-name');
-    if(!el)return '';
-    return el.textContent.replace(/\s*⚠\s*/g,'').trim().toLowerCase()
-      .replace(/\s+/g,' ');
-  }
-
-  function noteFor(card){
-    const s=loadShared(), key=keyFor(card);
-    return key ? (s[key]||'') : '';
-  }
-
-  function writeNote(card,value){
-    const s=loadShared(), key=keyFor(card);
-    if(!key)return;
-    if(value)s[key]=value;
-    else delete s[key];
-    saveShared(s);
-  }
-
-  function syncAllSameExercise(card){
-    const key=keyFor(card);
-    if(!key)return;
-    const note=noteFor(card);
-
-    document.querySelectorAll('.exercise-card').forEach(other=>{
-      if(keyFor(other)!==key)return;
-      const indicator=other.querySelector('.note-indicator');
-      if(indicator)indicator.classList.toggle('has-note',!!note);
-      const ta=other.querySelector('.note-editor textarea');
-      if(ta && document.activeElement!==ta)ta.value=note;
-    });
+  bindProgressPhotoBoxes();
   }
 
   function setup(card){
