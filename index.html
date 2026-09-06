@@ -21,6 +21,16 @@
 .topbar{display:flex;align-items:center;gap:12px;padding:20px 0;border-bottom:1px solid #292D35;position:sticky;top:0;background:rgba(9,10,12,.94);backdrop-filter:blur(16px);z-index:5}.back{border:0;background:none;color:#F4F4F1;font-size:27px;padding:2px 7px;cursor:pointer}.page-title{font-size:20px;font-weight:750}.page-sub{font-size:10px;letter-spacing:.16em;color:#8F949D;margin-top:3px}
 .strength-cycle{font-size:9px;letter-spacing:.12em;color:#8F949D;padding:18px 0;border-bottom:1px solid #292D35;line-height:1.7}
 .workout-section{border-bottom:1px solid #292D35}.workout-head{width:100%;border:0;background:none;color:#F4F4F1;padding:20px 2px;display:flex;justify-content:space-between;align-items:center;text-align:left;cursor:pointer}.workout-head small{display:block;color:#8F949D;font-size:9px;letter-spacing:.22em}.workout-head strong{display:block;font-size:20px;margin-top:5px}.chev{font-size:25px;color:#8F949D;transition:.2s}.workout-section.open .chev{transform:rotate(45deg)}.workout-body{display:none;padding:0 0 20px}.workout-section.open .workout-body{display:block}
+.exercise-card{border-bottom:1px solid #292D35}
+.exercise-toggle{width:100%;border:0;background:none;color:#F4F4F1;padding:16px 0;display:flex;justify-content:space-between;align-items:center;text-align:left;cursor:pointer}
+.exercise-toggle-main{min-width:0}
+.exercise-toggle .exercise-group{margin-bottom:4px}
+.exercise-toggle .exercise-name{margin:0}
+.exercise-chevron{font-size:22px;color:#8F949D;transition:.2s;flex:0 0 auto;margin-left:14px}
+.exercise-card.open .exercise-chevron{transform:rotate(45deg)}
+.exercise-body{display:none;padding:0 0 18px}
+.exercise-card.open .exercise-body{display:block}
+
 .exercise-card{background:#111318;border:1px solid #292D35;border-radius:17px;padding:16px;margin-bottom:10px}.exercise-top{display:flex;justify-content:space-between;gap:10px}.exercise-group{font-size:9px;letter-spacing:.18em;color:#8F949D;text-transform:uppercase}.exercise-name{font-size:17px;font-weight:700;margin-top:5px}.shared{font-size:8px;letter-spacing:.12em;color:#777D86;border:1px solid #343943;padding:4px 6px;border-radius:99px;height:max-content}.exercise-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}label{font-size:9px;letter-spacing:.12em;color:#8F949D}input{display:block;width:100%;margin-top:6px;background:#151820;border:1px solid #30343C;color:#F4F4F1;border-radius:10px;padding:10px;font-size:14px;outline:0}.exercise-actions{display:flex;gap:7px;margin-top:11px}.action-btn{background:none;border:1px solid #30343C;color:#C5C8CC;border-radius:9px;padding:7px 9px;font-size:11px}.action-btn.muted{color:#777D86}.progress-hint{font-size:11px;color:#9CA1A9;line-height:1.45;margin-top:12px;padding-top:11px;border-top:1px solid #252931}.complete-btn{width:100%;border:1px solid #454A52;background:#171A20;color:#F4F4F1;padding:14px;border-radius:13px;font-weight:700}
 /* Original run-plan styles */
 
@@ -185,7 +195,7 @@ button:has(+ .set-row) {
 /* Each set: number | KG | x | Wdh. */
 #strengthWorkouts .set-row {
   display: grid !important;
-  grid-template-columns: 30px minmax(0,1fr) 18px minmax(0,1fr) !important;
+  grid-template-columns: 28px minmax(0,1fr) 18px minmax(0,1fr) 28px !important;
   gap: 8px !important;
   align-items: center !important;
   width: 100% !important;
@@ -255,6 +265,54 @@ button:has(+ .set-row) {
 .strength-section-locked .workout-body{pointer-events:none}
 .strength-section-locked .complete-btn{display:none}
 </style>
+<style>
+/* Set controls: add and delete without changing scroll position */
+#strengthWorkouts .delete-set-btn{
+  width:28px !important;
+  height:28px !important;
+  padding:0 !important;
+  border:1px solid var(--border) !important;
+  border-radius:7px !important;
+  background:transparent !important;
+  color:var(--text-muted) !important;
+  font-size:18px !important;
+  line-height:1 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  cursor:pointer !important;
+}
+#strengthWorkouts .delete-set-btn:active{transform:scale(.96);}
+</style>
+
+
+
+<style id="projectp-note-css">
+.note-wrap{position:relative;display:inline-flex;flex:1;min-width:0}
+.note-wrap .action-btn{width:100%;box-sizing:border-box}
+.note-indicator{
+ position:absolute;right:5px;top:3px;width:14px;height:14px;
+ line-height:14px;font-size:12px;text-align:center;color:#F2C94C;
+ display:none;pointer-events:none;z-index:10
+}
+.note-indicator.has-note{display:block}
+.note-editor{
+ display:none;margin-top:10px;padding:12px;border:1px solid #30343C;
+ border-radius:12px;background:#111318;box-sizing:border-box
+}
+.note-editor.open{display:block}
+.note-editor textarea{
+ display:block;width:100%;height:78px;box-sizing:border-box;resize:none;
+ background:#0D0F13;border:1px solid #353A43;border-radius:8px;
+ color:#F4F4F1;padding:10px;font:inherit;line-height:1.45
+}
+.note-editor-actions{display:flex;gap:8px;margin-top:8px}
+.note-editor-actions button{
+ border:1px solid #3A3F48;background:#181B21;color:#F4F4F1;
+ border-radius:8px;padding:8px 11px;font-size:11px;cursor:pointer
+}
+.note-editor-actions .note-delete{color:#AEB2B9}
+</style>
 </head>
 <body>
 <div id="page-home" class="page active"><div class="shell home"><div>
@@ -303,17 +361,17 @@ button:has(+ .set-row) {
       <h4>Einheit A – Rumpf &amp; Stabilität (Di)</h4>
       <table class="kraft-table">
         <tr><td>Plank</td><td>3× 30-45 Sek halten</td><td>60 Sek</td></tr>
-        <tr><td>Side Plank je Seite</td><td>3× 20-30 Sek halten</td><td>60 Sek</td></tr>
+        <tr><td>Side Plank per Side</td><td>3× 20-30 Sek halten</td><td>60 Sek</td></tr>
         <tr><td>Dead Bug</td><td>3× 10/Seite · 2 Sek runter, 1 Sek halten</td><td>60 Sek</td></tr>
-        <tr><td>Glute Bridge einbeinig</td><td>3× 12/Seite · Tempo 2-1-2 Sek</td><td>60 Sek</td></tr>
+        <tr><td>Single-Leg Glute Bridge</td><td>3× 12/Seite · Tempo 2-1-2 Sek</td><td>60 Sek</td></tr>
       </table>
       <div class="kraft-progress-title">Aktueller Stand</div>
       <div class="kraft-progress" id="kraftProgressA"></div>
       <h4>Einheit B – Beine &amp; Kraft (Do)</h4>
       <table class="kraft-table">
-        <tr><td>Kniebeugen</td><td>3× 12-15 · Tempo 2-1-2 Sek</td><td>90 Sek</td></tr>
-        <tr><td>Ausfallschritte</td><td>3× 10/Bein · kontrolliert, kein Wackeln</td><td>90 Sek</td></tr>
-        <tr><td>Wadenheben einbeinig</td><td>3× 15/Seite · 2 Sek hoch, 2 Sek runter</td><td>60 Sek</td></tr>
+        <tr><td>Squats</td><td>3× 12-15 · Tempo 2-1-2 Sek</td><td>90 Sek</td></tr>
+        <tr><td>Lunges</td><td>3× 10/Bein · kontrolliert, kein Wackeln</td><td>90 Sek</td></tr>
+        <tr><td>Single-Leg Calf Raise</td><td>3× 15/Seite · 2 Sek hoch, 2 Sek runter</td><td>60 Sek</td></tr>
         <tr><td>Single-Leg Deadlift</td><td>3× 8-10/Seite · langsam, kontrolliert</td><td>90 Sek</td></tr>
       </table>
       <div class="kraft-progress-title">Aktueller Stand</div>
@@ -597,10 +655,10 @@ var kraftExercises = [
   {id:'a-plank', unit:'A', label:'Plank'},
   {id:'a-sideplank', unit:'A', label:'Side Plank'},
   {id:'a-deadbug', unit:'A', label:'Dead Bug'},
-  {id:'a-glutebridge', unit:'A', label:'Glute Bridge'},
-  {id:'b-squat', unit:'B', label:'Kniebeugen'},
-  {id:'b-lunge', unit:'B', label:'Ausfallschritte'},
-  {id:'b-calfraise', unit:'B', label:'Wadenheben'},
+  {id:'a-glutebridge', unit:'A', label:'Single-Leg Glute Bridge'},
+  {id:'b-squat', unit:'B', label:'Squats'},
+  {id:'b-lunge', unit:'B', label:'Lunges'},
+  {id:'b-calfraise', unit:'B', label:'Single-Leg Calf Raise'},
   {id:'b-deadlift', unit:'B', label:'Single-Leg Deadlift'}
 ];
 var kraftProgress = {};
@@ -964,34 +1022,34 @@ loadKraftProgress();
 <script>
 const STRENGTH_KEY='projectp-strength-v1';
 const strengthWorkouts=[
-{id:'lower1',name:'LOWER 1',exercises:[
-{id:'trizepsdruecken',name:'Trizepsdrücken',group:'Trizeps'},
-{id:'bizeps-stange-umgedreht-einhaendig',name:'Bizeps an der Stange umgedreht, einhändig',group:'Bizeps'},
-{id:'hecksquat',name:'Hecksquat',group:'Beine'},
-{id:'beinbeuger-hinten',name:'Beinbeuger hinten',group:'Beine'},
-{id:'bauch-crunches-gewicht',name:'Bauch mit Gewicht – Crunches',group:'Bauch'}]},
+{id:'lower1',name:'ARMS & LEGS 1',exercises:[
+{id:'trizepsdruecken',name:'Triceps Pushdown',group:'TRICEPS',video:'https://www.youtube.com/watch?v=HIKzvHkibWc&t=20s'},
+{id:'bizeps-stange-umgedreht-einhaendig',name:'Single-Arm Reverse-Grip Bar Curl',group:'BICEPS'},
+{id:'hecksquat',name:'Hack Squat',group:'LEGS'},
+{id:'beinbeuger-hinten',name:'Leg Curl',group:'LEGS'},
+{id:'bauch-crunches-gewicht',name:'Weighted Crunches',group:'CORE'}]},
 {id:'pushpull1',name:'PUSH & PULL 1',exercises:[
-{id:'multipresse-brust-low',name:'Multipresse Brust low',group:'Brust'},
-{id:'butterfly',name:'Butterfly',group:'Brust'},
-{id:'rueckenzug-eng-von-oben',name:'Rückenzug eng von oben',group:'Rücken'},
-{id:'tbar-rows',name:'T-Bar Rows',group:'Rücken'},
-{id:'seitheben',name:'Seitheben',group:'Schulter'},
-{id:'nacken-dumbbells',name:'Nacken mit Dumbbells',group:'Nacken'},
-{id:'butterfly-reverse',name:'Butterfly reverse',group:'Hintere Schulter'}]},
-{id:'lower2',name:'LOWER 2',exercises:[
-{id:'trizeps-ueberkopf',name:'Trizeps überkopf',group:'Trizeps'},
-{id:'bizepscurls',name:'Bizepscurls',group:'Bizeps'},
-{id:'hecksquat',name:'Hecksquat',group:'Beine'},
-{id:'beinbeuger-hinten',name:'Beinbeuger hinten',group:'Beine'},
-{id:'bauch-crunches-gewicht',name:'Bauch mit Gewicht – Crunches',group:'Bauch'}]},
+{id:'multipresse-brust-low',name:'Smith Machine Chest Press – Low',group:'CHEST'},
+{id:'butterfly',name:'Pec Deck',group:'CHEST'},
+{id:'rueckenzug-eng-von-oben',name:'Close-Grip Lat Pulldown',group:'BACK'},
+{id:'tbar-rows',name:'T-Bar Row',group:'BACK'},
+{id:'seitheben',name:'Lateral Raise',group:'SHOULDERS'},
+{id:'nacken-dumbbells',name:'Dumbbell Shrugs',group:'TRAPS'},
+{id:'butterfly-reverse',name:'Reverse Pec Deck',group:'REAR DELTS'}]},
+{id:'lower2',name:'ARMS & LEGS 2',exercises:[
+{id:'trizeps-ueberkopf',name:'Overhead Triceps Extension',group:'TRICEPS'},
+{id:'bizepscurls',name:'Biceps Curls',group:'BICEPS'},
+{id:'hecksquat',name:'Hack Squat',group:'LEGS'},
+{id:'beinbeuger-hinten',name:'Leg Curl',group:'LEGS'},
+{id:'bauch-crunches-gewicht',name:'Weighted Crunches',group:'CORE'}]},
 {id:'pushpull2',name:'PUSH & PULL 2',exercises:[
-{id:'multipresse-brust-high',name:'Multipresse Brust high',group:'Brust'},
-{id:'butterfly',name:'Butterfly',group:'Brust'},
-{id:'rueckenzug-weit',name:'Rückenzug weit',group:'Rücken'},
-{id:'ueberzuege-ruecken',name:'Überzüge Rücken',group:'Rücken'},
-{id:'schulter-seitheben',name:'Schulter Seitheben',group:'Schulter'},
-{id:'nacken',name:'Nacken',group:'Nacken'},
-{id:'hintere-ruecken-seil-einhaendig',name:'Hintere Rücken mit Seil einhändig',group:'Hintere Schulter'}]}
+{id:'multipresse-brust-high',name:'Smith Machine Chest Press – High',group:'CHEST'},
+{id:'butterfly',name:'Pec Deck',group:'CHEST'},
+{id:'rueckenzug-weit',name:'Wide-Grip Lat Pulldown',group:'BACK'},
+{id:'ueberzuege-ruecken',name:'Cable Pullover',group:'BACK'},
+{id:'schulter-seitheben',name:'Lateral Raise',group:'SHOULDERS'},
+{id:'nacken',name:'Shrugs',group:'TRAPS'},
+{id:'hintere-ruecken-seil-einhaendig',name:'Single-Arm Cable Rear Delt Fly',group:'REAR DELTS'}]}
 ];
 let strengthState={lastCompleted:null,exercises:{}};
 try{const r=localStorage.getItem(STRENGTH_KEY);if(r)strengthState=Object.assign(strengthState,JSON.parse(r));}catch(e){}
@@ -1010,13 +1068,25 @@ function renderStrength(){
   h.innerHTML='<span><small>KRAFTTRAINING</small><strong>'+w.name+'</strong></span><span class="chev">+</span>';
   const b=document.createElement('div');b.className='workout-body';
   w.exercises.forEach(ex=>{
-   const st=exerciseState(ex.id), card=document.createElement('div');card.className='exercise-card';
-   card.innerHTML='<div class="exercise-top"><div><div class="exercise-group">'+ex.group+'</div><div class="exercise-name">'+ex.name+'</div></div><span class="shared">SHARED</span></div>'+
-   '<div class="sets-title">SÄTZE</div><div class="set-list" data-sets="'+ex.id+'">'+
-Array.from({length:Math.max(1,(st.setsData||[]).length)},(_,idx)=>{const v=st.setsData&&st.setsData[idx]?st.setsData[idx]:{weight:'',reps:''};return '<div class="set-row"><span class="set-no">'+(idx+1)+'</span><input data-id="'+ex.id+'" data-set="'+idx+'" data-field="weight" value="'+(v.weight||'')+'" placeholder="kg"><span class="times">×</span><input data-id="'+ex.id+'" data-set="'+idx+'" data-field="reps" value="'+(v.reps||'')+'" placeholder="Wdh."></div>'}).join('')+
+   const st=exerciseState(ex.id), card=document.createElement('div');card.className='exercise-card';card.dataset.exerciseId=ex.id;
+   const toggle=document.createElement('button');
+   toggle.type='button';
+   toggle.className='exercise-toggle';
+   toggle.setAttribute('aria-expanded','false');
+   toggle.innerHTML='<span class="exercise-toggle-main"><div class="exercise-group">'+ex.group+'</div><div class="exercise-name">'+ex.name+'</div></span><span class="exercise-chevron">+</span>';
+   const body=document.createElement('div');
+   body.className='exercise-body';
+   body.innerHTML='<div class="sets-title">SÄTZE</div><div class="set-list" data-sets="'+ex.id+'">'+
+Array.from({length:Math.max(1,(st.setsData||[]).length)},(_,idx)=>{const v=st.setsData&&st.setsData[idx]?st.setsData[idx]:{weight:'',reps:''};return '<div class="set-row"><span class="set-no">'+(idx+1)+'</span><input data-id="'+ex.id+'" data-set="'+idx+'" data-field="weight" value="'+(v.weight||'')+'" placeholder="kg"><span class="times">×</span><input data-id="'+ex.id+'" data-set="'+idx+'" data-field="reps" value="'+(v.reps||'')+'" placeholder="Wdh."><button type="button" class="delete-set-btn" data-deleteset="'+ex.id+'" data-set="'+idx+'" aria-label="Satz '+(idx+1)+' löschen">−</button></div>'}).join('')+
 '</div><button class="add-set-btn" data-addset="'+ex.id+'">+ Satz hinzufügen</button>'+
    '<div class="exercise-actions"><button class="action-btn" data-note="'+ex.id+'">Notiz</button><button class="action-btn muted" data-video="'+ex.id+'">▶ Video</button><button class="action-btn muted" data-alt="'+ex.id+'">↔ Alternative</button></div>'+
    '<div class="progress-hint">'+(st.weight?'💡 Ergebnis speichern und später die Steigerung ableiten.':'💡 Noch kein Gewicht hinterlegt.')+'</div>';
+   toggle.onclick=()=>{
+     const open=!card.classList.contains('open');
+     card.classList.toggle('open',open);
+     toggle.setAttribute('aria-expanded',open?'true':'false');
+   };
+   card.append(toggle,body);
    b.appendChild(card)
   });
   const done=document.createElement('button');done.className='complete-btn';done.textContent='✓ Training absolvieren & nächste Einheit setzen';done.disabled=w.id!==next.id;
@@ -1024,23 +1094,54 @@ Array.from({length:Math.max(1,(st.setsData||[]).length)},(_,idx)=>{const v=st.se
   b.appendChild(done);h.onclick=()=>s.classList.toggle('open');s.append(h,b);c.appendChild(s)
  });
  c.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{const st=exerciseState(i.dataset.id);if(i.dataset.set!==undefined){if(!st.setsData)st.setsData=[{weight:'',reps:''},{weight:'',reps:''},{weight:'',reps:''},{weight:'',reps:''}];const idx=Number(i.dataset.set);if(!st.setsData[idx])st.setsData[idx]={weight:'',reps:''};st.setsData[idx][i.dataset.field]=i.value;}saveStrength()}));
+function rerenderStrengthKeepingPosition(workoutId, focusSelector, exerciseId){
+ const scrollY=window.scrollY;
+ window.__projectpOpenWorkoutId=workoutId;
+ window.__projectpOpenExerciseId=exerciseId||null;
+ renderStrength();
+ requestAnimationFrame(()=>{
+   const sec=document.querySelector('#strengthWorkouts .workout-section[data-workout-id="'+workoutId+'"]');
+   if(sec){
+     sec.classList.add('open');
+     const head=sec.querySelector('.workout-head');
+     if(head)head.setAttribute('aria-expanded','true');
+     if(window.__projectpOpenExerciseId){
+       const card=sec.querySelector('.exercise-card[data-exercise-id="'+window.__projectpOpenExerciseId+'"]');
+       if(card){
+         card.classList.add('open');
+         const toggle=card.querySelector('.exercise-toggle');
+         if(toggle)toggle.setAttribute('aria-expanded','true');
+       }
+     }
+   }
+   window.scrollTo(0,scrollY);
+   if(focusSelector){
+     const el=document.querySelector(focusSelector);
+     if(el)el.focus({preventScroll:true});
+   }
+ });
+}
+
 c.querySelectorAll('[data-addset]').forEach(btn=>btn.onclick=()=>{
  const current=btn.closest('.workout-section');
- window.__projectpOpenWorkoutId=current ? current.dataset.workoutId : null;
- const st=exerciseState(btn.dataset.addset);
+ const workoutId=current ? current.dataset.workoutId : null;
+ const exerciseId=btn.dataset.addset;
+ const st=exerciseState(exerciseId);
  if(!st.setsData)st.setsData=[];
  st.setsData.push({weight:'',reps:''});
  saveStrength();
- renderStrength();
- requestAnimationFrame(()=>{
-   const id=window.__projectpOpenWorkoutId;
-   if(!id)return;
-   const sec=document.querySelector('#strengthWorkouts .workout-section[data-workout-id="'+id+'"]');
-   if(!sec)return;
-   sec.classList.add('open');
-   const head=sec.querySelector('.workout-head');
-   if(head)head.setAttribute('aria-expanded','true');
- });
+ rerenderStrengthKeepingPosition(workoutId, null, exerciseId);
+});
+
+c.querySelectorAll('[data-deleteset]').forEach(btn=>btn.onclick=()=>{
+ const current=btn.closest('.workout-section');
+ const workoutId=current ? current.dataset.workoutId : null;
+ const exerciseId=btn.dataset.deleteset;
+ const st=exerciseState(exerciseId);
+ if(!st.setsData || st.setsData.length<=1)return;
+ st.setsData.splice(Number(btn.dataset.set),1);
+ saveStrength();
+ rerenderStrengthKeepingPosition(workoutId, null, exerciseId);
 });
  c.querySelectorAll('[data-video]').forEach(x=>x.onclick=()=>alert('Für diese Übung ist noch kein Video hinterlegt. Später kann das YouTube-Video direkt in ProjectP eingebettet werden.'));
  c.querySelectorAll('[data-alt]').forEach(x=>x.onclick=()=>alert('Alternativen können wir pro Übung hinterlegen.'));
@@ -1080,10 +1181,10 @@ var runKraftExercises=[
 {id:'a-plank',unit:'A',label:'Plank'},
 {id:'a-sideplank',unit:'A',label:'Side Plank'},
 {id:'a-deadbug',unit:'A',label:'Dead Bug'},
-{id:'a-glutebridge',unit:'A',label:'Glute Bridge'},
-{id:'b-squat',unit:'B',label:'Kniebeugen'},
-{id:'b-lunge',unit:'B',label:'Ausfallschritte'},
-{id:'b-calfraise',unit:'B',label:'Wadenheben'},
+{id:'a-glutebridge',unit:'A',label:'Single-Leg Glute Bridge'},
+{id:'b-squat',unit:'B',label:'Squats'},
+{id:'b-lunge',unit:'B',label:'Lunges'},
+{id:'b-calfraise',unit:'B',label:'Single-Leg Calf Raise'},
 {id:'b-deadlift',unit:'B',label:'Single-Leg Deadlift'}];
 var runKraftProgress={};var RUN_KRAFT_STORAGE='hh-kiel-kraft-progress';
 function loadRunKraft(){try{var raw=localStorage.getItem(RUN_KRAFT_STORAGE);if(raw)runKraftProgress=JSON.parse(raw)}catch(e){};['A','B'].forEach(function(u){var c=document.getElementById('kraftProgress'+u);if(!c)return;c.innerHTML='';runKraftExercises.filter(function(x){return x.unit===u}).forEach(function(ex){var row=document.createElement('div');row.className='kraft-progress-row';var label=document.createElement('span');label.className='kraft-progress-label';label.textContent=ex.label;var input=document.createElement('input');input.type='text';input.className='kraft-input';input.placeholder='z.B. Körpergewicht, +5kg';input.value=runKraftProgress[ex.id]||'';input.addEventListener('input',function(){runKraftProgress[ex.id]=input.value;localStorage.setItem(RUN_KRAFT_STORAGE,JSON.stringify(runKraftProgress))});row.append(label,input);c.appendChild(row)})})}
@@ -1344,4 +1445,149 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
   })();
 </script>
-</body></html>
+
+
+
+
+
+
+
+
+
+<script id="projectp-note-system">
+(function(){
+  const KEY='projectp-strength-v1';
+  const SHARED_KEY='projectp-shared-notes-v1';
+
+  function loadShared(){
+    try{return JSON.parse(localStorage.getItem(SHARED_KEY)||'{}')}catch(e){return {}}
+  }
+  function saveShared(s){localStorage.setItem(SHARED_KEY,JSON.stringify(s))}
+
+  // Canonical key = exercise name, normalized. Every occurrence of the same
+  // exercise therefore reads/writes the exact same note.
+  function keyFor(card){
+    const el=card.querySelector('.exercise-name');
+    if(!el)return '';
+    return el.textContent.replace(/\s*⚠\s*/g,'').trim().toLowerCase()
+      .replace(/\s+/g,' ');
+  }
+
+  function noteFor(card){
+    const s=loadShared(), key=keyFor(card);
+    return key ? (s[key]||'') : '';
+  }
+
+  function writeNote(card,value){
+    const s=loadShared(), key=keyFor(card);
+    if(!key)return;
+    if(value)s[key]=value;
+    else delete s[key];
+    saveShared(s);
+  }
+
+  function syncAllSameExercise(card){
+    const key=keyFor(card);
+    if(!key)return;
+    const note=noteFor(card);
+
+    document.querySelectorAll('.exercise-card').forEach(other=>{
+      if(keyFor(other)!==key)return;
+      const indicator=other.querySelector('.note-indicator');
+      if(indicator)indicator.classList.toggle('has-note',!!note);
+      const ta=other.querySelector('.note-editor textarea');
+      if(ta && document.activeElement!==ta)ta.value=note;
+    });
+  }
+
+  function setup(card){
+    if(card.dataset.sharedNoteReady==='1'){
+      syncAllSameExercise(card);
+      return;
+    }
+
+    const body=card.querySelector('.exercise-body');
+    const noteBtn=card.querySelector('[data-note]');
+    if(!body||!noteBtn)return;
+
+    const wrap=document.createElement('div');
+    wrap.className='note-wrap';
+
+    const indicator=document.createElement('span');
+    indicator.className='note-indicator';
+    indicator.textContent='⚠';
+    indicator.setAttribute('aria-label','Notiz vorhanden');
+
+    const editor=document.createElement('div');
+    editor.className='note-editor';
+    editor.innerHTML=
+      '<textarea placeholder="Notiz zur Übung..."></textarea>'+
+      '<div class="note-editor-actions">'+
+      '<button type="button" class="note-save">Speichern</button>'+
+      '<button type="button" class="note-delete">Notiz löschen</button>'+
+      '</div>';
+
+    noteBtn.parentNode.insertBefore(wrap,noteBtn);
+    wrap.appendChild(noteBtn);
+    noteBtn.appendChild(indicator);
+    body.appendChild(editor);
+
+    editor.querySelector('textarea').value=noteFor(card);
+
+    noteBtn.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      editor.classList.toggle('open');
+      if(editor.classList.contains('open')){
+        editor.querySelector('textarea').value=noteFor(card);
+        editor.querySelector('textarea').focus();
+      }
+    },true);
+
+    editor.querySelector('.note-save').addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      writeNote(card,editor.querySelector('textarea').value.trim());
+      editor.classList.remove('open');
+      syncAllSameExercise(card);
+    });
+
+    editor.querySelector('.note-delete').addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      writeNote(card,'');
+      editor.querySelector('textarea').value='';
+      editor.classList.remove('open');
+      syncAllSameExercise(card);
+    });
+
+    card.dataset.sharedNoteReady='1';
+    syncAllSameExercise(card);
+  }
+
+  function scan(){
+    document.querySelectorAll('.exercise-card').forEach(setup);
+  }
+
+  function start(){
+    scan();
+    new MutationObserver(scan).observe(document.body,{childList:true,subtree:true});
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);
+  else start();
+})();
+</script>
+<script>
+document.addEventListener('click',function(e){
+ const btn=e.target.closest('[data-video]');
+ if(!btn)return;
+ e.preventDefault();e.stopPropagation();
+ const card=btn.closest('.exercise-card');
+ const nameEl=card&&card.querySelector('.exercise-name');
+ const name=nameEl?nameEl.textContent.replace(/⚠/g,'').trim():'';
+ if(name==='Triceps Pushdown'){
+   window.open('https://www.youtube.com/watch?v=HIKzvHkibWc&t=20s','_blank','noopener,noreferrer');
+ }
+},true);
+</script></body></html>
