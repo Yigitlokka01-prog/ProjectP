@@ -1601,10 +1601,10 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
           const url=URL.createObjectURL(rec.blob);
           box.dataset.objectUrl=url;
           box.innerHTML='<img src="'+url+'" alt="'+id+' Foto">';
-          box.classList.add('has-photo');
+          box.classList.add('has-photo'); box.dataset.hasPhoto='1';
         }else{
           box.innerHTML='📷';
-          box.classList.remove('has-photo');
+          box.classList.remove('has-photo'); box.dataset.hasPhoto='0';
         }
       }catch(e){
         box.innerHTML='📷';
@@ -1614,14 +1614,34 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
     renderHistory();
   }
 
+  function photoInput(key,source){
+    const cap=key.charAt(0).toUpperCase()+key.slice(1);
+    return document.getElementById('pp'+cap+(source==='camera'?'Camera':'Gallery'));
+  }
+
   function choosePhotoSource(key,week){
-    const camera=document.getElementById('pp'+key.charAt(0).toUpperCase()+key.slice(1)+'Camera');
-    const gallery=document.getElementById('pp'+key.charAt(0).toUpperCase()+key.slice(1)+'Gallery');
+    const camera=photoInput(key,'camera'), gallery=photoInput(key,'gallery');
     if(!camera||!gallery)return;
-    const useCamera=window.confirm('Kamera öffnen?\n\nOK = Kamera\nAbbrechen = Galerie');
-    const input=useCamera?camera:gallery;
-    input.value='';
-    input.click();
+
+    const overlay=document.createElement('div');
+    overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
+    overlay.innerHTML='<div style="width:min(92vw,360px);background:#1f2228;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px;box-sizing:border-box;text-align:center;color:#fff;"><div style="font-size:15px;margin-bottom:6px;">Foto hinzufügen</div><div style="font-size:11px;color:#9da2aa;margin-bottom:16px;">Wie möchtest du das Bild auswählen?</div><div style="display:flex;gap:8px;"><button type="button" data-camera style="flex:1;padding:13px 8px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:#292d34;color:#fff;font-size:12px;">📷 Kamera</button><button type="button" data-gallery style="flex:1;padding:13px 8px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:#292d34;color:#fff;font-size:12px;">🖼 Galerie</button></div><button type="button" data-cancel style="margin-top:9px;width:100%;padding:10px;border:0;background:transparent;color:#9da2aa;font-size:11px;">Abbrechen</button></div>';
+
+    document.body.appendChild(overlay);
+
+    const close=function(){overlay.remove()};
+    overlay.querySelector('[data-camera]').addEventListener('click',function(){
+      close();
+      camera.value='';
+      camera.click();
+    });
+    overlay.querySelector('[data-gallery]').addEventListener('click',function(){
+      close();
+      gallery.value='';
+      gallery.click();
+    });
+    overlay.querySelector('[data-cancel]').addEventListener('click',close);
+    overlay.addEventListener('click',function(e){if(e.target===overlay)close()});
   }
 
   async function savePhoto(key,file){
@@ -1666,10 +1686,9 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
       const box=document.getElementById('pp'+id+'Box');
       if(box && box.dataset.bound!=='1'){
         box.dataset.bound='1';
-        box.addEventListener('click',async function(){
+        box.addEventListener('click',function(){
           const w=pweek();
-          const rec=await ppPhotoGet(w,key);
-          if(rec&&rec.blob) showPhotoPreview(key,w);
+          if(box.dataset.hasPhoto==='1') showPhotoPreview(key,w);
           else choosePhotoSource(key,w);
         });
       }
