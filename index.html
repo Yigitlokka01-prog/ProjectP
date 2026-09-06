@@ -246,7 +246,7 @@ button:has(+ .set-row) {
 .pp-primary{width:100%;margin-top:10px;border:1px solid var(--border);border-radius:7px;background:var(--surface-2);color:var(--text);padding:9px;font-size:11px}
 .pp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pp-grid .wide{grid-column:1/-1}
 .pp-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.pp-photos label>span{display:block;font-size:8px;letter-spacing:.12em;color:var(--text-muted);margin-bottom:5px}
-.pp-photos input{display:none}.pp-photo{aspect-ratio:3/4;border:1px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px;overflow:hidden;text-align:center}
+.pp-photo-actions{display:flex;gap:4px;margin-top:5px}.pp-photo-btn{flex:1;padding:7px 2px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2,#20232a);color:var(--text);font-size:8px}.pp-photo-btn:active{opacity:.7}.pp-photos>div>span{display:block;font-size:8px;letter-spacing:.12em;color:var(--text-muted);margin-bottom:5px}.pp-photos input{display:none}.pp-photo{aspect-ratio:3/4;border:1px dashed var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:18px;overflow:hidden;text-align:center}
 .pp-photo img{width:100%;height:100%;object-fit:cover}.pp-history-row{border-top:1px solid var(--border);padding:9px 0;font-size:11px;line-height:1.5}.pp-history-row:first-child{border-top:0}.pp-history-row strong{font-family:'Oswald',sans-serif;font-size:14px}
 .strength-section-locked{opacity:.42}.strength-section-locked .workout-head{cursor:not-allowed}
 .strength-lock-text{padding:0 14px 14px;color:var(--text-muted);font-size:10px;line-height:1.5}
@@ -756,9 +756,15 @@ if ('serviceWorker' in navigator) {
     <div class="pp-card-title">Fotos · aktuelle Woche</div>
     <div class="pp-muted">Jede Progressionswoche bekommt einen eigenen Satz aus Front, Seite und Rücken. Die Fotos älterer Wochen werden nicht überschrieben.</div>
     <div class="pp-photos">
-      <label><span>FRONT</span><div class="pp-photo" id="ppFrontBox">📷</div><input id="ppFront" type="file" accept="image/*" capture="environment"></label>
-      <label><span>SEITE</span><div class="pp-photo" id="ppSideBox">📷</div><input id="ppSide" type="file" accept="image/*" capture="environment"></label>
-      <label><span>RÜCKEN</span><div class="pp-photo" id="ppBackBox">📷</div><input id="ppBack" type="file" accept="image/*" capture="environment"></label>
+      <div><span>FRONT</span><div class="pp-photo" id="ppFrontBox">📷</div>
+        <div class="pp-photo-actions"><button type="button" class="pp-photo-btn" data-camera="ppFrontCamera">📷 Kamera</button><button type="button" class="pp-photo-btn" data-gallery="ppFrontGallery">🖼 Galerie</button></div>
+        <input id="ppFrontCamera" type="file" accept="image/*" capture="environment"><input id="ppFrontGallery" type="file" accept="image/*"></div>
+      <div><span>SEITE</span><div class="pp-photo" id="ppSideBox">📷</div>
+        <div class="pp-photo-actions"><button type="button" class="pp-photo-btn" data-camera="ppSideCamera">📷 Kamera</button><button type="button" class="pp-photo-btn" data-gallery="ppSideGallery">🖼 Galerie</button></div>
+        <input id="ppSideCamera" type="file" accept="image/*" capture="environment"><input id="ppSideGallery" type="file" accept="image/*"></div>
+      <div><span>RÜCKEN</span><div class="pp-photo" id="ppBackBox">📷</div>
+        <div class="pp-photo-actions"><button type="button" class="pp-photo-btn" data-camera="ppBackCamera">📷 Kamera</button><button type="button" class="pp-photo-btn" data-gallery="ppBackGallery">🖼 Galerie</button></div>
+        <input id="ppBackCamera" type="file" accept="image/*" capture="environment"><input id="ppBackGallery" type="file" accept="image/*"></div>
     </div>
   </div>
   <div class="pp-card">
@@ -1515,7 +1521,24 @@ button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
   function savePhoto(key,file){if(!file)return;const s=pstate();if(!s.start){alert('Bitte zuerst ein Startdatum speichern.');return}const w=pweek(),r=new FileReader();r.onload=()=>{s.weeks[w]=Object.assign(s.weeks[w]||{}, {[key]:r.result});psave(s);loadWeek()};r.readAsDataURL(file)}
   function renderHistory(){const el=document.getElementById('ppHistory'),s=pstate(),keys=Object.keys(s.weeks).map(Number).sort((a,b)=>a-b);if(!keys.length){el.innerHTML='<div class="pp-muted">Noch keine Woche gespeichert.</div>';return}el.innerHTML=keys.map(w=>{const d=s.weeks[w]||{},photos=[d.front,d.side,d.back].filter(Boolean).length;return '<div class="pp-history-row"><strong>Woche '+w+'</strong><br>Gewicht: '+(d.weight||'—')+' kg · Bauch: '+(d.waist||'—')+' cm<br>Brust: '+(d.chest||'—')+' cm · Arm: '+(d.arm||'—')+' cm · Oberschenkel: '+(d.thigh||'—')+' cm<br>'+photos+'/3 Fotos gespeichert</div>'}).join('')}
   ppSaveStart.onclick=saveStart;ppSaveData.onclick=saveData;
-  [['ppFront','front'],['ppSide','side'],['ppBack','back']].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>savePhoto(key,e.target.files[0])));
+  [
+  ['ppFrontCamera','ppFrontGallery','front'],
+  ['ppSideCamera','ppSideGallery','side'],
+  ['ppBackCamera','ppBackGallery','back']
+].forEach(([cameraId,galleryId,key])=>{
+  const camera=document.getElementById(cameraId), gallery=document.getElementById(galleryId);
+  if(camera) camera.addEventListener('change',e=>savePhoto(key,e.target.files[0]));
+  if(gallery) gallery.addEventListener('change',e=>savePhoto(key,e.target.files[0]));
+});
+document.querySelectorAll('[data-camera]').forEach(btn=>btn.addEventListener('click',()=>{
+  const input=document.getElementById(btn.dataset.camera); if(input) input.click();
+}));
+document.querySelectorAll('[data-gallery]').forEach(btn=>btn.addEventListener('click',()=>{
+  const input=document.getElementById(btn.dataset.gallery); if(input) input.click();
+}));
+document.querySelectorAll('.pp-photo').forEach(box=>box.addEventListener('click',()=>{
+  const gallery=box.parentElement.querySelector('[data-gallery]'); if(gallery) gallery.click();
+}));
   loadWeek();
 
   })();
